@@ -5,6 +5,7 @@ import base64
 import streamlit as st
 from io import BytesIO
 from PIL import Image
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 @st.cache(show_spinner=False)
@@ -60,7 +61,6 @@ css = """
 
 st.markdown(css, unsafe_allow_html=True)
 
-st.write("<p style='font-size: 1.2em;'>Innovative educational tool that uses SDXL and GPT-3 to create personalized and engaging stories, fostering education and personal growth in children in a fun and accessible way.</p>", unsafe_allow_html=True)
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -112,6 +112,9 @@ def generate_images(prompts, seed_values):
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = [executor.submit(generate_image, prompt, seed_value) for prompt, seed_value in zip(prompts, seed_values)]
         return [future.result() for future in futures]
+
+st.write("<p style='font-size: 1.2em;'><br>Innovative educational tool that uses SDXL and GPT-3 to create personalized and engaging stories, fostering education and personal growth in children in a fun and accessible way.</p>", unsafe_allow_html=True)
+
 
 nombre_personaje = st.text_input("Ingrese el nombre del personaje:")
 
@@ -195,7 +198,10 @@ for i, parrafo in enumerate(parrafos):
     entrada_imagen = f"ilustration \"{prompt}\" beautiful color, digital art"
     image_prompts.append(entrada_imagen)
 
-seed_values = [0] * len(parrafos)  # This line is modified
+
+user_seed = random.randint(0, 2**32 - 1) # Generates a random seed for the user
+seed_values = [user_seed] * len(parrafos)  # Uses the same seed for all images for this user
+
 grid_imagenes = []
 images = generate_images(image_prompts, seed_values)
 for i, parrafo in enumerate(parrafos):
